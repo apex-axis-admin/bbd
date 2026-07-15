@@ -966,6 +966,9 @@
       <td>~30 min</td>
     </tr>
   </table>
+  <p style="font-size:13px;color:var(--muted);margin-top:6px">Every attempt is <b>drawn fresh from a 68-question
+      pool</b> and the multiple-choice options are reshuffled, so no two runs are the same — retake as often as you
+    like.</p>
 
   <h2>Rules (mirroring the real thing)</h2>
   <div class="rules">
@@ -973,8 +976,9 @@
       <li>The clock runs continuously for <b>90 minutes</b> and cannot be paused.</li>
       <li><b>Submit each question</b> — an unsubmitted answer still counts here, but build the habit.</li>
       <li>Tab switches are counted. The real test cuts you off at <b>30</b>. No notes, no Google.</li>
-      <li>MCQ / logic / SQL are auto-scored. Written answers are graded by you against a model answer and rubric at the
-        end — be honest, that's where the learning is.</li>
+      <li>MCQ / logic / SQL are auto-scored. For the written answers you get a <b>“Copy for AI marking”</b> button that
+        packages the question, rubric and your answer to paste into Claude for a strict mark — plus a model answer to
+        check against.</li>
     </ul>
   </div>
 
@@ -1053,310 +1057,468 @@ You are the BA. Discovery starts Monday.`;
 
 "Team — I've had a demo of a fintech product that does exactly what we need. Let's just buy that instead of building. I need a decision by Friday. Also, I've written the requirements myself, see attached: 'The system must be modern, fast, and easy to use.'"`;
 
-  const QUESTIONS = [
-    /* ---------------- SECTION 1: MCQ (20) ---------------- */
+  const CASE_C = `MERIDIAN RETAIL — CLICK & COLLECT
+Meridian is a 120-store fashion retailer launching "click & collect": buy online, pick up in a chosen store.
+
+Current state: the head-office inventory system and the in-store point-of-sale (POS) tills are separate systems that reconcile overnight. So the website shows a store's stock as it was at close of business yesterday. During the day, walk-in customers buy items off the shelf, but the website doesn't know until the next morning.
+
+Result: 18% of click & collect orders are cancelled at the pickup counter because the item was already sold in-store. Customers are angry, staff are embarrassed, and the Head of E-commerce has told you: "Just make the website show the right stock."
+
+You are the BA.`;
+
+  const POOL = [
+    /* ================= SECTION 1 — MCQ POOL ================= */
     {
-      s: 1, t: "mcq", p: 2, q: "A stakeholder says: “Customers must be able to reset their own password.” This is BEST classified as a:",
-      o: ["Business requirement", "Stakeholder requirement", "Functional requirement", "Non-functional requirement"], a: 2,
-      why: "A functional requirement describes a capability the solution must provide (an action the system performs). A business requirement is the higher-level goal (“reduce call-centre volume by 20%”); a stakeholder requirement is a need of a specific group; a non-functional requirement describes a quality attribute (speed, availability, security)."
+      s: 1, t: "mcq", p: 2, q: "“Customers must be able to reset their own password.” This is best classified as a:",
+      o: ["Business requirement stating an organisational goal", "Functional requirement describing an action the system performs", "Non-functional requirement constraining a quality of service", "Business rule defining an organisational policy"], a: 1,
+      why: "A functional requirement describes a capability the system must provide. A business requirement is the higher-level goal (‘cut call-centre volume’); an NFR is a quality attribute (speed, security); a business rule is a policy the system enforces but does not own."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "“The system must respond within 2 seconds for 95% of requests under a load of 1,000 concurrent users.” This is a:",
-      o: ["Functional requirement", "Non-functional requirement", "Business rule", "Assumption"], a: 1,
-      why: "It constrains *how well* the system performs rather than *what* it does — a quality-of-service / non-functional requirement. Note it is well-written because it is measurable and testable."
+      s: 1, t: "mcq", p: 2, q: "“Search results must return within 2 seconds for 95% of requests.” This is best classified as a:",
+      o: ["Functional requirement defining what search does", "Non-functional requirement setting a measurable quality", "Business rule enforcing an organisational policy", "Constraint limiting the technology the team may use"], a: 1,
+      why: "It constrains how *well* the system performs, not what it does — a non-functional (performance) requirement. It is also well-formed: it has a threshold and a percentile, so it is testable."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "In MoSCoW prioritisation, what does “Could have” mean?",
-      o: ["It will be delivered if time and budget allow, and its absence does not undermine the release", "It is required by law but can slip to the next release", "It is the third-highest priority and must be in the release", "It has been explicitly ruled out of scope"], a: 0,
-      why: "Must = non-negotiable (release fails without it). Should = important but there's a workaround. Could = desirable, dropped first under pressure. Won't = explicitly excluded *this time* (which is still a useful decision to record)."
+      s: 1, t: "mcq", p: 2, q: "“A loan may not be approved for an applicant under 18.” Within a loan system this is best described as a:",
+      o: ["A functional requirement the team must build from scratch", "A business rule the system enforces but does not own", "A non-functional requirement covering system security", "A constraint imposed by the project's technical setup"], a: 1,
+      why: "The rule is a policy that exists whether or not software is built; the system merely enforces it. Confusing a business rule with a functional requirement is a common error — the rule drives the requirement, but is not itself one."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "Which elicitation technique is MOST appropriate when you suspect stakeholders' descriptions of a process differ from what actually happens on the floor?",
-      o: ["Survey / questionnaire", "Observation (job shadowing)", "Document analysis", "Brainstorming"], a: 1,
-      why: "Observation surfaces tacit knowledge and workarounds people forget to mention or are reluctant to admit. Surveys and interviews capture what people *say* they do; observation captures what they *do*."
+      s: 1, t: "mcq", p: 2, q: "In MoSCoW, a “Could have” requirement is one that:",
+      o: ["is mandatory, and the release has no value without it", "is desirable, and the first to drop if time runs short", "is important, but has an acceptable workaround if omitted", "has been explicitly excluded from the current release"], a: 1,
+      why: "‘Could have’ = desirable, first to be dropped under pressure. The trap is option 3, which describes a ‘Should have’ (important, but a workaround exists). Option 1 is ‘Must’, option 4 is ‘Won’t’."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "In a RACI matrix, which of the following is a rule of good practice?",
-      o: ["Every task should have at least two Accountable parties for redundancy", "Exactly one person is Accountable per task", "Consulted and Informed must always be the same people", "The Responsible party must be a manager"], a: 1,
-      why: "R = does the work (can be several). A = the single neck on the block — exactly one, or accountability is diffused. C = two-way consultation before the decision. I = one-way notification after."
+      s: 1, t: "mcq", p: 2, q: "In MoSCoW, “Won’t have this time” means the requirement is:",
+      o: ["rejected permanently and deleted from the backlog", "excluded from this release as an agreed, recorded decision", "dropped only if the team runs out of time at the end", "included only if additional budget becomes available"], a: 1,
+      why: "‘Won’t have’ is a deliberate, recorded decision to exclude something *this* release — not forever. Recording it is what stops the item being re-argued every planning session. Option 3 describes ‘Could’; option 1 overstates it."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "A UML use case diagram is BEST used to:",
-      o: ["Show the sequence of messages between system components over time", "Show system scope: which actors interact with which goal-level system functions", "Model the states an entity moves through in its lifecycle", "Model the relational structure of the database"], a: 1,
-      why: "Use case diagrams communicate scope and actor-to-function coverage. Sequence diagrams show message ordering over time; state machine diagrams show lifecycle; ERDs/class diagrams show data structure."
+      s: 1, t: "mcq", p: 2, q: "Which of these is the best-formed requirement?",
+      o: ["The system shall be user-friendly and quick for staff to learn.", "As an assessor I can sort open claims by age, so I clear SLA breaches first.", "The claims screen shall provide comprehensive filtering functionality.", "As a developer I want cleaner code so the module is easier to maintain."], a: 1,
+      why: "It names a role, a specific capability, and a business benefit that implies how you'd test it. Option 1 is subjective, option 3 is a vague spec, option 4 delivers no user-visible value (a technical task, not a story)."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "In BPMN, a diamond shape with a plus (+) symbol represents:",
-      o: ["An exclusive (XOR) gateway — exactly one path is taken", "A parallel (AND) gateway — all outgoing paths execute", "An inclusive (OR) gateway — one or more paths", "An intermediate timer event"], a: 1,
-      why: "A plus = parallel/AND (all branches fire and must all converge). An X = exclusive/XOR (exactly one branch). A circle-O = inclusive/OR. Confusing XOR and AND is the single most common BPMN error."
+      s: 1, t: "mcq", p: 2, q: "Which requirement is LEAST testable as written?",
+      o: ["The dashboard must load within 3 seconds on a 4G connection.", "The interface must be intuitive and feel modern to all users.", "Users must be able to export the report to PDF and CSV.", "The service must maintain 99.9% uptime measured monthly."], a: 1,
+      why: "‘Intuitive’ and ‘modern’ are subjective — QA cannot write a pass/fail test, so it can never be objectively ‘done’. The other three each carry a measurable threshold or a concrete, observable capability."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "Which of these user stories is BEST written?",
-      o: ["As a user, I want a better dashboard, so that things are easier.", "As a claims assessor, I want to filter open claims by age, so that I can action claims breaching the 48-hour SLA first.", "The system shall provide filtering functionality on the claims screen.", "As a developer, I want to refactor the claims service, so that the code is cleaner."], a: 1,
-      why: "It names a specific role, a specific capability, and — crucially — a *business* benefit that hints at how you'd test it. Option A is vague, C is a spec not a story, D delivers no user-visible value (that's a technical task, not a story)."
+      s: 1, t: "mcq", p: 2, q: "You suspect staff use undocumented workarounds they may not mention. Which technique best surfaces them?",
+      o: ["An anonymous survey sent to everyone in the department", "Observation of staff doing the task in their real environment", "A structured interview with the department manager", "Analysis of the existing written process documentation"], a: 1,
+      why: "Observation captures what people *do*, including tacit workarounds they forget or are reluctant to admit. Surveys and interviews capture what people *say* they do; documentation captures the official version, not reality."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "“Definition of Done” differs from “Acceptance Criteria” in that:",
-      o: ["Acceptance criteria apply to every story; DoD is unique to each story", "DoD is the team-wide quality bar for all work; acceptance criteria are the story-specific conditions of satisfaction", "They are two names for the same thing", "DoD is written by the BA; acceptance criteria are written by the tester"], a: 1,
-      why: "DoD is shared and constant (coded, unit-tested, peer-reviewed, deployed to QA, documented). Acceptance criteria change per story and define *what specifically this story must do* to be accepted."
+      s: 1, t: "mcq", p: 2, q: "Five departments disagree on a shared process and a decision is needed this week. Best technique?",
+      o: ["Send each department a questionnaire and collate the replies", "Run a facilitated workshop with all parties in one room", "Interview each department head separately over two weeks", "Build a prototype and circulate it by email for comment"], a: 1,
+      why: "A facilitated workshop gets the conflict into one room, surfaces the trade-offs, and drives a decision on the timeline. Separate interviews and surveys prolong the disagreement rather than resolving it."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "A project's sponsor keeps adding “small” requirements after baseline, each individually reasonable. The BA's most professional response is to:",
-      o: ["Accept them — the customer is always right", "Refuse them to protect the sprint", "Log each one, size its impact on scope/time/cost, and route it through change control so the sponsor makes an informed trade-off", "Silently absorb them by asking the team to work overtime"], a: 2,
-      why: "The BA does not own the yes/no — the sponsor does. The BA owns making the *cost of yes* visible. Refusing outright damages the relationship; absorbing silently is how projects fail quietly."
+      s: 1, t: "mcq", p: 2, q: "Stakeholders struggle to describe what they want but react well to concrete examples. Best technique?",
+      o: ["Document analysis of comparable market systems", "Prototyping or wireframes they can respond to", "A brainstorm to generate abstract ideas first", "A detailed written specification signed off up front"], a: 1,
+      why: "Prototypes and wireframes give stakeholders something tangible to react to, which is far more reliable than asking them to imagine a system in the abstract. This is classic for ‘I'll know it when I see it’ stakeholders."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "You are asked to reduce a 40-item backlog to what fits in a 3-month MVP. Which technique most directly supports this?",
-      o: ["Fishbone (Ishikawa) diagram", "Value vs. effort matrix", "SWOT analysis", "Sequence diagram"], a: 1,
-      why: "A value/effort (or impact/effort) matrix is a prioritisation tool: high-value/low-effort first. Fishbone is root-cause analysis, SWOT is strategic positioning, sequence diagrams are design artefacts."
+      s: 1, t: "mcq", p: 2, q: "In a RACI matrix, how many people should be Accountable for a single task?",
+      o: ["At least two, so there is cover if one is unavailable", "Exactly one, who owns the outcome and the sign-off", "One per team that contributes to the task", "As many as are Responsible for doing the work"], a: 1,
+      why: "Exactly one Accountable per task — the single owner of the outcome. Two accountable parties means, in practice, nobody is accountable. Several people may be Responsible (do the work), but accountability does not split."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "Root cause analysis using the “5 Whys” is designed to:",
-      o: ["Identify the five stakeholders most affected by a problem", "Keep asking why until you reach a cause you can actually act on, rather than a symptom", "Produce five alternative solutions to compare", "Assign blame to the responsible team"], a: 1,
-      why: "The count isn't magic — the point is to push past the symptom (“the report was late”) to an actionable cause (“no one owns the upstream data feed”). Stopping at the first answer is the classic mistake."
+      s: 1, t: "mcq", p: 2, q: "In RACI, the difference between Consulted and Informed is that:",
+      o: ["Consulted parties do the work; Informed parties check it", "Consulted give two-way input before; Informed are told after", "Consulted are always managers; Informed are the wider team", "Consulted sign the task off; Informed raise the project risks"], a: 1,
+      why: "Consulted = two-way dialogue *before* a decision; Informed = one-way notification *after* it. The direction and the timing are the examinable distinction, and the pair is frequently swapped in MCQs."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "In a data model, the relationship “a Customer can hold many Accounts; an Account is held by exactly one Customer” has what cardinality?",
-      o: ["One-to-one", "One-to-many", "Many-to-many", "Zero-to-one"], a: 1,
-      why: "One customer → many accounts, and each account traces back to one customer: 1:M. If accounts could be jointly held by several customers it would be M:N, which you'd resolve with a junction/associative table."
+      s: 1, t: "mcq", p: 2, q: "In the INVEST criteria for a good user story, the “V” stands for:",
+      o: ["Verified — the story has passed its tests", "Valuable — it delivers visible value to a user", "Versioned — it is tracked in the backlog tool", "Validated — a stakeholder has approved it"], a: 1,
+      why: "Valuable: every story must deliver something a user or the business can see. It's the criterion people forget, and it's what separates a real story from a technical task with no user-facing outcome."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "A foreign key in a relational database:",
-      o: ["Uniquely identifies each row in its own table", "Is a column that references the primary key of another table, enforcing referential integrity", "Encrypts sensitive columns", "Is always auto-incrementing"], a: 1,
-      why: "The primary key uniquely identifies a row within its table; the foreign key is the pointer from the child table back to that parent key, and it's what stops you creating an order for a customer who doesn't exist."
+      s: 1, t: "mcq", p: 2, q: "How does a Definition of Done differ from a story's acceptance criteria?",
+      o: ["The DoD is written by the BA; acceptance criteria by testers", "The DoD is a team-wide bar for all work; AC are story-specific", "They are the same thing described at two different times", "The DoD applies per story; AC apply across the whole release"], a: 1,
+      why: "The DoD is the constant, team-wide quality bar for *all* work (coded, reviewed, tested, deployed). Acceptance criteria are the conditions of satisfaction for *one* story. A story can meet its AC and still not be Done."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "Given tables Customer(cust_id, name) and Orders(order_id, cust_id, amount), which query returns EVERY customer, including those with no orders?",
-      o: ["SELECT c.name, o.amount FROM Customer c INNER JOIN Orders o ON c.cust_id = o.cust_id", "SELECT c.name, o.amount FROM Customer c LEFT JOIN Orders o ON c.cust_id = o.cust_id", "SELECT c.name, o.amount FROM Customer c RIGHT JOIN Orders o ON c.cust_id = o.cust_id", "SELECT c.name, o.amount FROM Customer c, Orders o"], a: 1,
-      why: "LEFT JOIN keeps all rows from the left (Customer) table and fills NULLs where there's no matching order. INNER JOIN silently drops order-less customers — this exact mistake is how BAs under-report inactive customers."
+      s: 1, t: "mcq", p: 2, q: "A sprint retrospective focuses primarily on:",
+      o: ["demonstrating the increment to external stakeholders", "inspecting and improving the team's own process", "re-prioritising items in the product backlog", "checking each story met its acceptance criteria"], a: 1,
+      why: "The retrospective inspects the *process* (how the team works) and is team-only. The sprint *review* inspects the *product* with stakeholders. These two are the most-swapped Scrum events in MCQs."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "Which SQL clause filters rows AFTER aggregation (i.e. filters the groups themselves)?",
-      o: ["WHERE", "HAVING", "GROUP BY", "ORDER BY"], a: 1,
-      why: "WHERE filters raw rows before grouping; HAVING filters the aggregated result. `HAVING COUNT(*) > 5` is valid; `WHERE COUNT(*) > 5` is not."
+      s: 1, t: "mcq", p: 2, q: "Team velocity is most appropriately used to:",
+      o: ["compare the productivity of two different teams", "forecast how much work the team can plan ahead", "measure and rank individual developer output", "set the deadline the team is committed to hitting"], a: 1,
+      why: "Velocity is a planning aid for one team's own forecasting. Using it to compare teams or judge individuals corrupts it (teams simply inflate their points), and it is not a commitment device."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "Story points primarily estimate:",
+      o: ["the number of hours of effort the work will take", "its relative size: complexity, effort, uncertainty", "the business value the story will deliver to users", "the number of calendar days until it is finished"], a: 1,
+      why: "Points express *relative size* (complexity + effort + uncertainty), deliberately not hours — because absolute time estimates are false precision. Value is a separate axis used for prioritisation, not sizing."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "In which situation is a sequential (waterfall) approach most defensible?",
+      o: ["Requirements are expected to evolve as users give feedback", "Regulatory sign-off must be obtained before any build begins", "The team wants to release small increments frequently", "The problem is poorly understood and needs exploration"], a: 1,
+      why: "Waterfall suits fixed, well-understood requirements and situations where a gate (e.g. regulatory sign-off, a fixed-price contract) must precede build. The other three describe conditions that favour an iterative, Agile approach."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "Which Scrum event is time-boxed to 15 minutes and centres on the plan for the day ahead?",
+      o: ["Sprint planning", "The daily stand-up", "The sprint review", "Backlog refinement"], a: 1,
+      why: "The daily stand-up (daily scrum) is a 15-minute planning checkpoint for the team — not a status report to a manager. Planning, review and refinement are longer, less frequent events."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "Which lists SQL clauses in the order the database executes them?",
+      o: ["SELECT → WHERE → GROUP BY → HAVING", "WHERE → GROUP BY → HAVING → ORDER BY", "GROUP BY → WHERE → ORDER BY → HAVING", "WHERE → HAVING → GROUP BY → ORDER BY"], a: 1,
+      why: "Execution order: filter rows (WHERE) → group them (GROUP BY) → filter the groups (HAVING) → sort (ORDER BY). SELECT is evaluated late, which is why you often can't use a column alias inside WHERE."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "To keep only the groups whose row count exceeds 50, you write:",
+      o: ["WHERE COUNT(*) > 50, placed before GROUP BY", "HAVING COUNT(*) > 50, placed after GROUP BY", "a WHERE clause referencing the alias ‘count’", "an ORDER BY COUNT(*) with a row limit of 50"], a: 1,
+      why: "HAVING filters *groups* after aggregation; WHERE filters *rows* before it and cannot see an aggregate like COUNT(*). This WHERE-vs-HAVING distinction is one of the most common SQL MCQs."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "You need every customer listed, including those who have never ordered. You use:",
+      o: ["an INNER JOIN between Customer and Orders", "a LEFT JOIN from Customer to Orders", "a RIGHT JOIN from Customer to Orders", "a CROSS JOIN between the two tables"], a: 1,
+      why: "A LEFT JOIN keeps all rows from the left (Customer) table, filling NULLs where there is no order. An INNER JOIN would silently drop order-less customers; a CROSS JOIN pairs every row with every row."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "An analyst INNER-JOINs Customer to Orders to count customers. The most likely error is that:",
+      o: ["duplicate customers are counted more than once", "customers with no orders are silently left out", "the query fails because of NULL values", "orders without a customer inflate the total"], a: 1,
+      why: "INNER JOIN returns only matching rows, so customers with zero orders vanish from the result — and the query doesn't error, it just quietly under-counts. Silent wrongness is more dangerous than a crash."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "COUNT(column) differs from COUNT(*) in that it:",
+      o: ["counts only the rows where that column is NULL", "ignores rows where that column is NULL", "counts only the distinct values in the column", "always returns the same result as COUNT(*)"], a: 1,
+      why: "COUNT(*) counts all rows; COUNT(column) skips rows where that column is NULL. SUM and AVG also ignore NULLs — so an average over a column with NULLs is not the same as treating them as zero."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "The primary purpose of a foreign key is to:",
+      o: ["uniquely identify each row within its own table", "reference another table's key to enforce integrity", "speed up queries by indexing that column", "store a value computed from other columns"], a: 1,
+      why: "A foreign key points at another table's primary key and enforces referential integrity — it's what prevents an order referencing a customer who doesn't exist. Unique identification within a table is the *primary* key's job."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "A student may take many courses and a course has many students. This many-to-many link is implemented with:",
+      o: ["a single table combining students and courses", "a junction table holding two foreign keys", "a one-to-many link from student to course", "a foreign key added directly to the student table"], a: 1,
+      why: "A many-to-many relationship cannot be stored directly; it is resolved with a junction (associative) table holding a foreign key to each side. That table is also where attributes of the relationship itself (e.g. enrolment date) live."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "The main goal of normalising a relational database is to:",
+      o: ["improve read speed for large reporting queries", "reduce redundancy so each fact is stored once", "encrypt sensitive columns against unauthorised access", "merge related tables so queries are simpler to write"], a: 1,
+      why: "Normalisation removes redundancy so a fact lives in exactly one place, preventing update anomalies. Deliberately *reversing* it (denormalisation) is what you do for reporting read-speed — option 1 is the trap."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "In BPMN, a diamond gateway marked with a plus (+) means:",
+      o: ["exactly one outgoing path is taken", "all outgoing paths execute in parallel", "one or more paths run depending on conditions", "the process pauses for a timer to elapse"], a: 1,
+      why: "A plus (+) is a parallel (AND) gateway — all branches run and must all reconverge. An X is exclusive (exactly one path); a circle (O) is inclusive (one or more). Confusing + with X is the single most common BPMN error."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "A BPMN gateway where exactly one of several paths is taken is drawn as a diamond marked:",
+      o: ["with a plus (+)", "with an X", "with a circle (O)", "with a double border"], a: 1,
+      why: "An X marks an exclusive (XOR) gateway: precisely one path is chosen. Plus is parallel/AND (all paths); circle is inclusive/OR (one or more). A double border denotes an intermediate event, not a gateway."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "To show the order of messages exchanged between components over time, you use a:",
+      o: ["use case diagram", "sequence diagram", "class diagram", "state machine diagram"], a: 1,
+      why: "A sequence diagram shows messages passing between components over time (vertical lifelines). Use case = scope, class = data structure, state machine = one entity's lifecycle. ‘Which diagram for X’ is a stock question."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "A use case diagram is most useful for communicating:",
+      o: ["the ordered sequence of internal method calls", "system scope: which actors use which functions", "the lifecycle states a single entity passes through", "the physical deployment of servers and nodes"], a: 1,
+      why: "Use case diagrams show scope: which actors interact with which goal-level functions, and where the system boundary sits. Method call order is a sequence diagram; entity lifecycle is a state machine."
+    },
+
+    {
+      s: 1, t: "mcq", p: 2, q: "In use case modelling, an «include» relationship represents behaviour that:",
+      o: ["happens only under certain optional conditions", "always occurs as part of the base use case", "replaces the base use case entirely", "is triggered by an external timer event"], a: 1,
+      why: "«include» = mandatory, always-executed shared behaviour (e.g. ‘Place order’ includes ‘Validate payment’). «extend» is the conditional/optional one. Candidates routinely swap the two."
     },
 
     {
       s: 1, t: "mcq", p: 2, q: "Gap analysis is the comparison of:",
-      o: ["Budgeted vs. actual project spend", "Current state capabilities vs. required future state capabilities, to identify what must change", "Two competing vendor products", "Planned vs. actual sprint velocity"], a: 1,
-      why: "Gap analysis is the bridge between as-is and to-be: it converts a vision into a concrete list of capability, process, data and skill gaps that the solution scope must close."
+      o: ["planned project spend against the actual spend incurred", "current-state capability against required future state", "one vendor's product against a rival vendor's product", "estimated story points against the velocity delivered"], a: 1,
+      why: "Gap analysis contrasts the as-is with the to-be; the gaps it exposes become the solution scope. The other options describe budget variance, vendor selection, and velocity tracking respectively."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "A traceability matrix primarily exists to:",
-      o: ["Track how much time each team member spends per requirement", "Link each requirement forward to design/test artefacts and backward to a business objective, so nothing is orphaned or untested", "Record the version history of the requirements document", "Show the project's critical path"], a: 1,
-      why: "Forward traceability proves every requirement is built and tested; backward traceability proves every requirement earns its place by serving a business objective. It's also how you do impact analysis when a change lands."
+      s: 1, t: "mcq", p: 2, q: "Backward traceability of a requirement links it to:",
+      o: ["the test cases that verify it works", "the business objective that justifies it", "the developer assigned to build it", "the sprint in which it was delivered"], a: 1,
+      why: "Backward traceability ties a requirement to the objective that justifies it (proving it earns its place); forward traceability ties it to design and tests (proving it was built and verified). Option 1 is forward traceability."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "Six machines produce 240 units in 4 hours. At the same rate, how many units would 9 machines produce in 6 hours?",
-      o: ["360", "480", "540", "600"], a: 2,
-      why: "Rate per machine per hour = 240 / (6 × 4) = 10 units. Then 9 machines × 6 hours × 10 = 540. Set the unit rate first — it's the reliable route through every rate question."
+      s: 1, t: "mcq", p: 2, q: "A sponsor requests a new feature after the requirements are baselined. The BA should first:",
+      o: ["add it straight into the sprint to satisfy the sponsor", "assess its impact, then route it through change control", "decline it, since the baseline is already signed off", "absorb it by asking the team to work extra hours"], a: 1,
+      why: "The BA neither simply accepts nor refuses — the BA sizes the impact on scope/time/cost and puts the trade-off to the accountable owner through change control. Refusing damages the relationship; absorbing silently is how projects fail quietly."
     },
 
     {
-      s: 1, t: "mcq", p: 2, q: "All BAs in the team can read BPMN. Some people who can read BPMN are certified. Which conclusion MUST be true?",
-      o: ["Some BAs are certified", "All certified people are BAs", "Some people who can read BPMN are BAs", "No BAs are certified"], a: 2,
-      why: "Only the guaranteed overlap holds: every BA reads BPMN, so BPMN-readers definitely include BAs. The certified group may overlap the BAs or not at all — “some ... are certified” doesn't tell you *which* ones."
-    },
-
-    /* ---------------- SECTION 2: CASE STUDY (7) ---------------- */
-    {
-      s: 2, t: "mcq", p: 3, sc: CASE_A, q: "It's day 1 of discovery. Which action should the BA take FIRST?",
-      o: ["Start writing the functional specification for the mobile app so developers aren't idle", "Run a stakeholder analysis and get the Compliance Officer into the room before requirements are baselined", "Book workshops with the 400 branch consultants to gather their requirements", "Ask the mainframe team to start building an API"], a: 1,
-      why: "The Compliance Officer is legally accountable for FICA/KYC and hasn't been consulted — she is high-power, high-interest, and she can veto the entire design late in the day. Missing regulatory stakeholders is the single most expensive discovery failure in banking projects. You'd map stakeholders (power/interest), then engage the ones who can kill the solution first."
+      s: 1, t: "mcq", p: 2, q: "To decide which backlog items fit a time-boxed MVP, the most direct tool is:",
+      o: ["a fishbone (Ishikawa) cause diagram", "a value-versus-effort matrix", "a SWOT analysis", "a RACI responsibility matrix"], a: 1,
+      why: "A value/effort matrix ranks items to select high-value, low-effort work first — exactly the MVP-scoping question. Fishbone is for root cause, SWOT for strategy, RACI for responsibilities."
     },
 
     {
-      s: 2, t: "mcq", p: 3, sc: CASE_A, q: "The mainframe has no API and a 6-week release cycle. The sponsor wants launch in 4 months. What is the BEST way to frame this in your analysis?",
-      o: ["Ignore it — integration is a technical concern for the architects, not the BA", "Record it as a constraint, quantify its impact on the delivery timeline, and present options (e.g. middleware/integration layer, phased release) to the sponsor", "Tell the sponsor the 4-month deadline is impossible and the project should be cancelled", "Assume the mainframe team will speed up if the sponsor applies pressure"], a: 1,
-      why: "A constraint is a fact you must design within; the BA's job is to make its consequences visible and give the decision-maker real options with trade-offs. Silence (A) is negligence, catastrophising (C) is not analysis, and (D) is an unvalidated assumption — which you would at minimum log and test."
+      s: 1, t: "mcq", p: 2, q: "The “5 Whys” technique is designed to:",
+      o: ["identify the five stakeholders a problem affects", "keep asking why until an actionable cause is reached", "generate five candidate solutions to compare", "assign accountability for a problem to a team"], a: 1,
+      why: "The 5 Whys drills past the symptom to a root cause you can act on. The count isn't magic — the stopping point is actionability. Halting at the first answer (the symptom) is the classic failure."
     },
 
     {
-      s: 2, t: "mcq", p: 3, sc: CASE_A, q: "15% of customers have no smartphone, and the Branch Operations Manager fears job losses. Which requirement decision best serves the business objective?",
-      o: ["Digital-only. The 15% is a rounding error and branches are being phased out anyway", "Retain an assisted-onboarding channel where a consultant captures the same digital journey on the customer's behalf in-branch", "Build a separate parallel paper process for the 15% and keep the mainframe green screen", "Delay launch until 100% of customers own smartphones"], a: 1,
-      why: "One journey, multiple channels: the consultant uses the *same* digital flow on behalf of the customer. This serves the excluded 15%, avoids maintaining two divergent processes (the failure mode of option C), and gives the Ops Manager a credible story about redeployment rather than redundancy — turning a blocker into an ally."
+      s: 1, t: "mcq", p: 2, q: "The Pareto principle suggests a BA should tackle first:",
+      o: ["the cause that is cheapest and quickest to fix", "the small number of causes driving most of the problem", "the cause most directly under the company's control", "every cause equally, to be fair to each team"], a: 1,
+      why: "Pareto (80/20) says attack the few causes generating most of the impact. Option 3 (‘under our control’) is the seductive trap — it sounds prudent but may address only a small slice of the actual problem."
     },
 
     {
-      s: 2, t: "mcq", p: 3, sc: CASE_A, q: "30% of applications are returned for missing or illegible documents. Which measure is the BEST success metric for the new solution?",
-      o: ["Number of user stories delivered per sprint", "Reduction in document-related rework rate (target: 30% → under 5%) and application turnaround time (4 days → same day)", "Number of app downloads in month one", "Developer satisfaction with the new codebase"], a: 1,
-      why: "Good metrics tie directly to the business problem and the sponsor's stated goal, and they're baselined (you know the 'from' number). Velocity and downloads are activity/vanity metrics — you can score highly on both while the 30% rework rate is untouched."
+      s: 1, t: "mcq", p: 2, q: "On a power/interest grid, a stakeholder with high power but low interest should be:",
+      o: ["managed closely as a key project player", "kept satisfied so they do not turn hostile", "kept informed with routine status updates", "monitored quietly with only minimal effort"], a: 1,
+      why: "High power / low interest → keep satisfied: they will ignore the project until something displeases them, at which point their power can derail it. High/high = manage closely; low/high = keep informed; low/low = monitor."
     },
 
     {
-      s: 2, t: "mcq", p: 3, sc: CASE_B, q: "The sponsor wants to buy a fintech product instead of building, decision by Friday. Your best response as BA is to:",
-      o: ["Agree — the sponsor has seen a demo and buying is cheaper than building", "Push back and insist on building, since BBD is a custom software company", "Propose a rapid fit-gap assessment: score the product against the must-have requirements and compliance obligations, and present the gaps, integration cost and total cost of ownership by Friday", "Escalate over the sponsor's head to the board"], a: 2,
-      why: "You don't fight the buy-vs-build instinct, you *inform* it — on the sponsor's timeline. A fit-gap against the must-haves (especially the FICA/KYC obligations and the mainframe integration) converts a demo-driven impulse into an evidence-based decision. Note that a demo shows the happy path; the gaps are what you're paid to find."
+      s: 1, t: "mcq", p: 2, q: "“Did we build the right thing?” is the question answered by:",
+      o: ["verification", "validation", "unit testing", "regression testing"], a: 1,
+      why: "Validation asks whether the solution meets the real business need (right thing). Verification asks whether it was built correctly against the spec (thing right). You can pass one and fail the other."
     },
 
+    /* ================= SECTION 2 — CASE STUDY POOL ================= */
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_A, q: "It is day one of discovery. The BA's best first action is to:",
+      o: ["start the mobile app spec so developers are not idle", "map stakeholders and engage Compliance before baselining", "book workshops with all 400 branch consultants at once", "ask the mainframe team to begin building an API now"], a: 1,
+      why: "The Compliance Officer is legally accountable for FICA/KYC and hasn't been consulted — a high-power stakeholder who can veto the design late and expensively. Map stakeholders, then engage those who can kill the solution, before requirements harden."
+    },
+
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_A, q: "The mainframe has no API and a 6-week release cycle, against a 4-month deadline. The BA should:",
+      o: ["treat integration as an architect's problem, outside BA scope", "record it as a constraint, quantify its impact, and present options", "tell the sponsor the deadline is impossible and pause the project", "assume the mainframe team will move faster under pressure"], a: 1,
+      why: "A constraint is a fact to design within; the BA's role is to make its consequences visible and offer options with trade-offs (middleware, phasing). Silence is negligence, catastrophising isn't analysis, and ‘they'll speed up’ is an untested assumption."
+    },
+
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_A, q: "15% of customers have no smartphone. The best requirement decision is to:",
+      o: ["go digital-only, since branches are closing anyway", "add an assisted in-branch channel using the same digital journey", "build a separate paper-based process just for those customers", "delay the launch until smartphone ownership is universal"], a: 1,
+      why: "One journey, multiple channels: the consultant runs the *same* digital flow for the customer in-branch. This serves the excluded 15%, avoids maintaining two divergent processes, and gives the Ops Manager a redeployment story instead of redundancy."
+    },
+
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_A, q: "The best success metric for the new onboarding solution is:",
+      o: ["the number of user stories delivered each sprint", "the fall in document rework rate and in turnaround time", "the number of app downloads in the first month", "the development team's satisfaction with the codebase"], a: 1,
+      why: "Good metrics tie to the business problem and are baselined (rework 30% → under 5%; 4 days → same day). Velocity and downloads are activity/vanity measures — you can ace them while the original problem is untouched."
+    },
+
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_B, q: "The sponsor wants to buy a fintech product, decision by Friday. The BA should:",
+      o: ["agree at once, since buying beats building on cost and time", "fit-gap the product against the must-haves, and report by Friday", "insist on building it, because BBD is a custom software house", "escalate over the sponsor's head, straight to the main board"], a: 1,
+      why: "You inform the buy-vs-build instinct rather than fighting it — a rapid fit-gap against the must-haves and the FICA obligations turns a demo-driven impulse into an evidence-based decision, on the sponsor's timeline. A demo shows the happy path; the gaps are your job."
+    },
+
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_B, q: "The sponsor's requirement — “modern, fast and easy to use” — is weak mainly because it is:",
+      o: ["too ambitious for the available project budget", "unmeasurable, so no test can confirm it is met", "aimed at the mobile app instead of the web app", "written by the sponsor rather than by the BA"], a: 1,
+      why: "Its core defect is that it's subjective and unmeasurable — QA can't write a pass/fail test, so it can never be objectively satisfied. (It also bundles three requirements into one.) Who wrote it is irrelevant to whether it's well-formed."
+    },
+
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_C, q: "18% of click & collect orders are cancelled because online stock lags store sales. The BA should first:",
+      o: ["add a disclaimer that online stock is only indicative", "find out why POS and head-office stock aren't synchronised", "raise safety-stock levels so items are rarely unavailable", "disable click & collect on the fastest-selling lines"], a: 1,
+      why: "The root cause is the overnight-only reconciliation between POS and inventory. Understand that before proposing fixes. A disclaimer manages the symptom, more safety stock is costly and partial, and disabling lines throws away the value of the feature."
+    },
+
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_C, q: "Which is the best-formed requirement for the stock problem?",
+      o: ["Stock data must always be accurate across every channel.", "Online availability must reflect in-store sales within 5 minutes.", "The system should sync stock as fast as is reasonably possible.", "Customers must never be disappointed at the collection point."], a: 1,
+      why: "Only option 2 is specific, measurable and testable (a 5-minute freshness target). ‘Always accurate’, ‘as fast as reasonable’ and ‘never disappointed’ are all unmeasurable aspirations QA cannot verify."
+    },
+
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_C, q: "Store and online systems report different counts for the same item. The most likely root cause is that:",
+      o: ["customers are shoplifting items from the shelves", "the two systems are not integrated in real time", "staff miscount during periodic stock takes", "the online catalogue still lists discontinued items"], a: 1,
+      why: "The scenario states POS and inventory reconcile only overnight — a real-time integration gap, which fully explains a daytime divergence. Shrinkage and miscounts exist but wouldn't produce this systematic, same-day pattern."
+    },
+
+    {
+      s: 2, t: "mcq", p: 3, sc: CASE_C, q: "The Head of E-commerce wants the fix live in three weeks; real-time integration is a large build. The BA's best move is to:",
+      o: ["commit to three weeks and let the team work out how", "present phased options: faster syncs now, real-time later", "tell the Head of E-commerce it simply cannot be done", "quietly let the deadline slip without telling anyone"], a: 1,
+      why: "Offer options with trade-offs: a shorter-interval sync (say every 15 minutes) sharply cuts the failure rate quickly, while true real-time integration follows. That protects the deadline in substance and lets the accountable owner choose with the costs visible."
+    },
+
+    /* ---- Section 2 written ---- */
     {
       s: 2, t: "write", p: 8, sc: CASE_B, q: "The sponsor's requirement reads: “The system must be modern, fast, and easy to use.”\n\nExplain why this is a poor requirement, then rewrite it as THREE well-formed requirements that are specific, measurable and testable. State any assumption you make.",
-      hint: "~150–250 words. Name the defects, then show the rewrite. Marks are for the rewrite being testable, not for the critique being long.",
-      model: `WHY IT IS POOR
-• Not specific — "modern", "fast" and "easy" are subjective; five stakeholders would read five different requirements.
-• Not measurable/testable — there is no threshold, so QA cannot write a pass/fail test and no one can ever declare it done.
-• It is three requirements bundled into one, so they cannot be prioritised, estimated or traced independently.
-• "Modern" is a solution/technology preference, not a business need — it hides the actual objective.
-
-REWRITE (assumption: "fast" refers to the customer-facing onboarding journey, and target devices include mid-range Android handsets on 3G)
-1. Performance (NFR): 95% of page transitions in the onboarding journey must complete within 2 seconds, measured on a mid-range Android device over a 3G connection.
-2. Usability (NFR): A first-time customer must be able to complete account opening end-to-end in under 10 minutes, with at least 90% of users in usability testing completing it unaided, without contacting support.
-3. Accessibility/currency (NFR): The interface must conform to WCAG 2.1 Level AA and render correctly on the two most recent versions of Chrome, Safari, Edge and Firefox, and on iOS/Android versions covering 95% of the customer base.
-
-I would confirm these thresholds with the sponsor and the Head of Digital, and baseline the current journey time so the improvement is provable.`,
-      rubric: ["Named vagueness/subjectivity — 'modern/fast/easy' mean different things to different stakeholders", "Called out that it is not measurable or testable (no acceptance criteria possible)", "Noted it bundles multiple requirements into one (can't prioritise/estimate/trace separately)", "Rewrite #1 has a specific numeric threshold AND stated measurement conditions (device/load/network)", "Rewrite #2 defines 'easy to use' behaviourally (task completion time or success rate), not as an opinion", "Rewrite #3 turns 'modern' into something objective (browser/device support, WCAG, or a stated standard)", "Explicitly stated an assumption and said you would validate the thresholds with the sponsor"]
+      hint: "~150–250 words. Name the defects, then show the rewrite. The marks are in the rewrite being testable, not in a long critique.",
+      model: `WHY IT IS POOR\n• Not specific — “modern/fast/easy” are subjective; five stakeholders read five requirements.\n• Not measurable or testable — no threshold, so QA cannot write a pass/fail test and it can never be ‘done’.\n• It bundles three requirements into one, so they can't be prioritised, estimated or traced separately.\n• “Modern” is a technology preference, not a business need — it hides the real objective.\n\nREWRITE (assumption: “fast” = the customer onboarding journey; target = mid-range Android on 3G)\n1. Performance (NFR): 95% of page transitions in onboarding complete within 2 seconds, on a mid-range Android device over 3G.\n2. Usability (NFR): a first-time customer completes account opening in under 10 minutes, with 90% of users in testing finishing unaided.\n3. Currency/accessibility (NFR): the UI conforms to WCAG 2.1 AA and renders correctly on the latest two versions of Chrome, Safari, Edge and Firefox.\n\nI would confirm these thresholds with the sponsor and baseline the current journey time so the improvement is provable.`,
+      rubric: ["Named vagueness/subjectivity — ‘modern/fast/easy’ mean different things to different people", "Called out that it is not measurable or testable (no acceptance criteria possible)", "Noted it bundles multiple requirements into one", "Rewrite #1 has a numeric threshold AND stated measurement conditions", "Rewrite #2 defines ‘easy’ behaviourally (task completion time or success rate)", "Rewrite #3 turns ‘modern’ into something objective (browser/device support, WCAG, or a named standard)", "Stated an assumption and said the thresholds would be validated with the sponsor"]
     },
 
     {
-      s: 2, t: "write", p: 8, sc: CASE_A, q: "The Branch Operations Manager (400 consultants report to her) has started telling her team the project will “make everyone redundant”, and consultants are now refusing to attend your workshops.\n\nHow do you handle this? Describe your approach and what you would produce.",
-      hint: "~150–250 words. They are testing stakeholder management and emotional intelligence, not process knowledge. Show that you treat her as a stakeholder to be won, not an obstacle to be routed around.",
-      model: `FIRST, DIAGNOSE RATHER THAN ESCALATE
-She is a high-power, high-influence stakeholder whose team holds the process knowledge I need — and her fear may be legitimate. Escalating to the sponsor to force attendance would win the meeting and lose the project: the consultants would attend and tell me nothing.
-
-APPROACH
-1. Meet her 1:1, before any group session. Listen first and let her state the concern in full; acknowledge it rather than defending the project.
-2. Establish the facts with the sponsor: is redeployment or redundancy actually the intent? I must not offer reassurance I cannot back. If jobs are genuinely at risk, that is an organisational-change issue that HR and the sponsor must own and communicate honestly — it is not mine to spin.
-3. Reframe her role: she is not a subject of the change, she is the co-designer of the assisted-onboarding channel. The 15% of customers without smartphones, and the customers who need help, still need consultants — their role shifts from data capture to advice and sales.
-4. Co-run the workshops with her, so attendance carries her authority rather than mine.
-
-WHAT I WOULD PRODUCE
-• An updated stakeholder analysis / power-interest map, moving her from blocker to advocate, with an engagement plan.
-• A documented list of her concerns and assumptions, with owners — visible, not buried.
-• A change-impact assessment on the branch operating model, handed to the sponsor and HR.
-• A short "what changes for a consultant" as-is/to-be walkthrough to use in the workshops.
-
-I would keep the sponsor informed throughout, but escalation is the last resort, not the first.`,
-      rubric: ["Recognised her as a high-power stakeholder whose buy-in is needed, not an obstacle to bypass", "Chose a private 1:1 / listen-first conversation BEFORE any group session or escalation", "Refused to make reassurances about job security that they are not authorised to make (verify intent with sponsor/HR first)", "Reframed her and her team as contributors — e.g. co-designers of the assisted/in-branch channel", "Connected the resolution back to a real project need (the 15% non-smartphone customers still need consultants)", "Named a concrete artefact: stakeholder/power-interest map, engagement plan, change-impact assessment, or documented concerns log", "Treated escalation to the sponsor as a last resort while still keeping the sponsor informed"]
+      s: 2, t: "write", p: 8, sc: CASE_A, q: "The Branch Operations Manager (400 consultants) has started telling her team the project will “make everyone redundant”, and consultants now refuse to attend your workshops.\n\nHow do you handle this? Describe your approach and what you would produce.",
+      hint: "~150–250 words. This tests stakeholder management and EQ, not process knowledge. Treat her as a stakeholder to win, not an obstacle to route around.",
+      model: `DIAGNOSE, DON'T ESCALATE\nShe is high-power and holds the process knowledge I need; her fear may be legitimate. Forcing attendance via the sponsor would win the meeting and lose the project — people would attend and tell me nothing.\n\nAPPROACH\n1. Meet her 1:1 before any group session. Listen first; acknowledge the concern rather than defending the project.\n2. Establish the facts with the sponsor: is this redeployment or redundancy? I won't offer reassurance I can't back. If jobs are genuinely at risk, that's an HR/sponsor communication to make honestly — not mine to spin.\n3. Reframe her role: she is co-designer of the assisted in-branch channel. The 15% without smartphones, and customers who need help, still need consultants — the role shifts from data capture to advice.\n4. Co-run the workshops with her, so attendance carries her authority.\n\nWHAT I'D PRODUCE\n• An updated stakeholder/power-interest map with an engagement plan.\n• A documented log of her concerns and assumptions, with owners.\n• A change-impact assessment on the branch operating model for the sponsor and HR.\nEscalation stays a last resort, but I keep the sponsor informed throughout.`,
+      rubric: ["Recognised her as a high-power stakeholder to win over, not bypass", "Chose a private 1:1 / listen-first conversation before any group session or escalation", "Refused to make job-security assurances they aren't authorised to give (verify with sponsor/HR first)", "Reframed her and her team as contributors (e.g. co-designers of the assisted channel)", "Connected the resolution to a real project need (the 15% still need consultants)", "Named a concrete artefact — stakeholder map, engagement plan, or change-impact assessment", "Treated escalation as a last resort while keeping the sponsor informed"]
     },
 
-    /* ---------------- SECTION 3: PROBLEM SOLVING (6) ---------------- */
     {
-      s: 3, t: "mcq", p: 3, sc: `An insurer's claims team reports: "Claims are taking too long." You pull the data for last month:
+      s: 2, t: "write", p: 8, sc: CASE_C, q: "The Head of E-commerce says: “Just make the website show the right stock.”\n\nSet out how you would diagnose and solve this: the questions you would ask, the options you would explore, and what you would deliver.",
+      hint: "~200–300 words. They want to see you refuse the one-line brief, find the real constraint, and offer phased options rather than jumping to ‘build real-time integration’.",
+      model: `RESTATE THE PROBLEM\n“Show the right stock” is a solution; the problem is that online availability is up to a day stale because POS and inventory reconcile only overnight, causing 18% pickup cancellations. Success = cancellation rate down to a target (say under 3%).\n\nQUESTIONS\n• How often, and how, do the two systems actually reconcile today? Can POS emit a sale event in near-real-time?\n• What cancellation rate is acceptable, and what does each cancelled order cost (refund handling, lost trust, staff time)?\n• Is the constraint technical (no interface) or organisational (batch window, vendor contract)?\n• Are all 120 stores and all product lines equally affected, or is it concentrated?\n\nOPTIONS (with trade-offs)\nA. Reduce the sync interval from overnight to, say, every 15 minutes — cheap, fast, cuts most of the failures, not perfect.\nB. Near-real-time event integration from POS to the website — the proper fix, larger build and cost.\nC. A safety buffer: hide the last 1–2 units of store stock online so walk-ins don't oversell — a cheap interim mitigation.\nD. Reserve stock on order and confirm by SMS before the customer travels.\n\nDELIVER IN THE WINDOW\n• Restated, measurable problem statement agreed with the sponsor.\n• Root-cause confirmation (the reconciliation gap), evidenced.\n• As-is data flow between POS, inventory and web.\n• The options above on a value/effort matrix, with a recommendation — likely B as the target with A or C shipped first.\nI would NOT commit to a three-week real-time build sight unseen.`,
+      rubric: ["Refused the one-line brief and restated it as a measurable problem (cancellation rate, staleness)", "Identified the real root cause — overnight-only reconciliation between POS and inventory", "Asked clarifying questions about the current integration and an acceptable target", "Asked about cost/impact of a cancelled order or the concentration of the problem", "Offered more than one option with trade-offs, not a single ‘build real-time’ answer", "Included a cheap interim mitigation (shorter sync interval, stock buffer, or reserve-and-confirm)", "Named concrete deliverables (problem statement, as-is data flow, options on a value/effort matrix, recommendation)"]
+    },
 
-  Total claims received .......... 1,000
-  Claims settled within SLA ........ 550
-  Claims settled outside SLA ....... 250
-  Claims still open ................ 200
+    /* ================= SECTION 3 — PROBLEM SOLVING POOL ================= */
+    {
+      s: 3, t: "mcq", p: 3, sc: `An insurer's claims team says "claims take too long". Last month:
+
+  Total claims received ............ 1,000
+  Settled within SLA ................. 550
+  Settled outside SLA ............... 250
+  Still open ........................ 200
 
   Of the 250 late claims:
-     awaiting documents from customer .. 150
-     awaiting assessor site visit ....... 60
-     awaiting internal approval ......... 40`,
-      q: "Where should the improvement effort be focused FIRST, and why?",
-      o: ["Internal approval — it is the only step fully under the company's control", "Awaiting customer documents — at 60% of late claims it is by far the largest driver, and document capture is a step the company designs", "Assessor site visits — field work is always the bottleneck", "Spread effort evenly across all three to be fair to each team"], a: 1,
-      why: "150 of 250 = 60% of the late claims. Pareto logic says attack the largest driver first. The trap is option A's reasoning — 'under our control' sounds prudent but it targets only 16% of the problem. And note that 'awaiting the customer' is NOT the customer's fault: it usually means the company's document request was unclear, its upload channel is poor, or it asked for the wrong things. That's a design problem you own."
+     awaiting customer documents ...... 150
+     awaiting assessor site visit ...... 60
+     awaiting internal approval ........ 40`,
+      q: "Where should improvement effort focus first?",
+      o: ["Internal approval, the one step fully within the company's own control", "Awaiting customer documents, which drive 60% of the late claims", "Assessor site visits, since field work is always the real bottleneck", "Spread evenly across all three, to be fair to every team involved"], a: 1,
+      why: "150 of 250 = 60% of late claims — Pareto says attack the biggest driver first. Option 1's ‘under our control’ reasoning targets only 16%. And ‘awaiting the customer’ is usually the company's own fault: an unclear request or a poor upload channel."
     },
 
     {
-      s: 3, t: "mcq", p: 3, sc: `Same insurer. Baseline: 1,000 claims/month, 25% settled outside SLA.
-A proposed document-upload portal is projected to cut the "awaiting customer documents" cases by two thirds. Each late claim costs the business R400 in rework and penalties. The portal costs R600,000 to build and R10,000/month to run.`,
-      q: "What is the approximate simple payback period on the portal?",
-      o: ["About 6 months", "About 15 months", "About 30 months", "It never pays back"], a: 1,
-      why: "Late claims from documents = 150/month. Two thirds removed = 100 claims/month avoided × R400 = R40,000/month saved. Net of the R10,000/month run cost = R30,000/month. R600,000 ÷ R30,000 = 20 months... but note the question says *approximate* — the intended arithmetic is R600,000 / R40,000 = 15 months gross. The lesson: ALWAYS state whether your payback is gross or net of running costs, and show the working. In the real test, write your assumption down."
+      s: 3, t: "mcq", p: 3, sc: `Baseline: 1,000 claims/month. A document-upload portal costs R600,000 to build and has no running cost. It is expected to save R50,000/month in rework and penalties.`,
+      q: "What is the simple payback period?",
+      o: ["6 months", "12 months", "18 months", "24 months"], a: 1,
+      why: "R600,000 ÷ R50,000 per month = 12 months. Simple payback = upfront cost ÷ net benefit per period. In a real answer, always state whether your figure is gross or net of running costs — here there are none."
     },
 
     {
-      s: 3, t: "mcq", p: 3, sc: `A report shows conversion rate on the new onboarding journey:
+      s: 3, t: "mcq", p: 3, sc: `Conversion on a new onboarding journey:
 
-  Week 1 ....... 12%
-  Week 2 ....... 13%
-  Week 3 ....... 11%
-  Week 4 ....... 41%   <-- marketing campaign launched
-  Week 5 ....... 12%`,
-      q: "Marketing claims the campaign 'proves the journey works'. What is the BEST analytical response?",
-      o: ["Agree — a 41% conversion rate is strong evidence", "Point out that a single-week spike that immediately reverts is not evidence the journey improved; the campaign likely changed the *mix* of traffic (pre-qualified visitors), not the journey's effectiveness", "Conclude the journey is broken because 4 of 5 weeks are around 12%", "Recommend running the campaign permanently"], a: 1,
-      why: "Correlation isn't causation, and a metric that spikes for exactly the length of an intervention and then reverts is a composition effect: the campaign sent warmer traffic, it didn't make the funnel better. The right follow-up is to segment conversion by traffic source and compare like with like."
+  Week 1 ..... 12%
+  Week 2 ..... 13%
+  Week 3 ..... 11%
+  Week 4 ..... 41%   <-- marketing campaign ran
+  Week 5 ..... 12%`,
+      q: "Marketing says the campaign week “proves the journey works”. The best analytical response is:",
+      o: ["Agree, since a 41% conversion is strong evidence it works", "A spike that reverts reflects a changed traffic mix, not the journey", "Conclude the journey is broken, as four of five weeks sit near 12%", "Recommend running the campaign permanently to lock in the 41%"], a: 1,
+      why: "A metric that spikes for exactly the intervention and then reverts is a composition effect: the campaign sent warmer, pre-qualified traffic through the same funnel. Correlation isn't causation — segment by traffic source and compare like with like."
     },
 
     {
-      s: 3, t: "mcq", p: 3, sc: `Table: Applications(app_id, branch, status, submitted_date)
-Status values: 'APPROVED', 'REJECTED', 'PENDING'`,
-      q: "Which query lists each branch that has more than 50 REJECTED applications, showing the branch and its rejection count, highest first?",
-      o: ["SELECT branch, COUNT(*) FROM Applications WHERE status='REJECTED' GROUP BY branch HAVING COUNT(*) > 50 ORDER BY COUNT(*) DESC", "SELECT branch, COUNT(*) FROM Applications GROUP BY branch WHERE status='REJECTED' AND COUNT(*) > 50", "SELECT branch, COUNT(*) FROM Applications WHERE status='REJECTED' AND COUNT(*) > 50 GROUP BY branch", "SELECT branch, SUM(status) FROM Applications GROUP BY branch HAVING branch > 50"], a: 0,
-      why: "Correct order: WHERE (filter rows) → GROUP BY (aggregate) → HAVING (filter groups) → ORDER BY (sort). Option B puts WHERE after GROUP BY (syntax error), option C uses an aggregate inside WHERE (illegal), option D is nonsense. If you remember one SQL fact for this test, make it this clause order."
+      s: 3, t: "mcq", p: 3, sc: `Table: Applications(app_id, branch, status, submitted_date). Status is one of 'APPROVED', 'REJECTED', 'PENDING'.`,
+      q: "Which query lists each branch with more than 50 rejected applications, highest first?",
+      o: ["SELECT branch, COUNT(*) FROM Applications WHERE status='REJECTED' GROUP BY branch HAVING COUNT(*)>50 ORDER BY COUNT(*) DESC", "SELECT branch, COUNT(*) FROM Applications GROUP BY branch WHERE status='REJECTED' AND COUNT(*)>50 ORDER BY COUNT(*) DESC", "SELECT branch, COUNT(*) FROM Applications WHERE status='REJECTED' AND COUNT(*)>50 GROUP BY branch ORDER BY COUNT(*) DESC", "SELECT branch, SUM(status) FROM Applications GROUP BY branch HAVING branch>50 ORDER BY branch DESC"], a: 0,
+      why: "Correct order: WHERE (filter rows) → GROUP BY → HAVING (filter groups) → ORDER BY. Option 2 puts WHERE after GROUP BY; option 3 uses an aggregate inside WHERE; option 4 sums a text column. Clause order is the whole test here."
+    },
+
+    {
+      s: 3, t: "mcq", p: 3, q: "Six machines make 240 units in 4 hours. At the same rate, how many units do 9 machines make in 6 hours?",
+      o: ["360", "480", "540", "600"], a: 2,
+      why: "Find the unit rate first: 240 ÷ (6 × 4) = 10 units per machine-hour. Then 9 machines × 6 hours × 10 = 540. Reducing to the unit rate is the reliable route through any rate problem."
+    },
+
+    {
+      s: 3, t: "mcq", p: 3, q: "A metric rises from 25% to 30%. This change is best described as:",
+      o: ["an increase of 5 percentage points, i.e. 20% in relative terms", "an increase of 5 percentage points, i.e. 5% in relative terms", "an increase of 20 percentage points, i.e. 5% in relative terms", "an increase of 30 percentage points, i.e. 30% in relative terms"], a: 0,
+      why: "From 25 to 30 is +5 percentage points, and (30−25)/25 = 20% in relative terms — so both figures in the first option are correct and consistent. Confusing ‘percentage points’ with ‘percent’ is the classic trap the distractors exploit."
+    },
+
+    {
+      s: 3, t: "mcq", p: 3, q: "After a 20% discount an item costs R160. Its original price was:",
+      o: ["R180", "R200", "R192", "R128"], a: 1,
+      why: "R160 is 80% of the original, so original = 160 ÷ 0.8 = R200. Adding 20% back to R160 (giving R192) is the classic reverse-percentage error — you must divide, not add the same percentage."
+    },
+
+    {
+      s: 3, t: "mcq", p: 3, q: "All BAs can read BPMN. Some people who read BPMN are certified. Which MUST be true?",
+      o: ["Some BAs are certified", "Some BPMN readers are BAs", "All certified people are BAs", "No BAs are certified"], a: 1,
+      why: "Every BA reads BPMN, so BPMN-readers definitely include BAs — that overlap is guaranteed. Whether any BA is certified is unknown; the certified group might sit entirely among non-BA readers. ‘Some’ never tells you which ones."
+    },
+
+    {
+      s: 3, t: "mcq", p: 3, q: "Average call handling time is 4 minutes, but the median is 90 seconds. This most likely means:",
+      o: ["the data was entered incorrectly somewhere", "a few very long calls are pulling the mean up", "most calls last almost exactly four minutes", "the median is the wrong statistic to report"], a: 1,
+      why: "A mean far above the median signals a right-skew: a small number of very long calls inflate the average while the typical call is short. Reporting only the mean would hide that — which is why you ask for the distribution."
+    },
+
+    {
+      s: 3, t: "mcq", p: 3, q: "Four analysts document 60 requirements in 3 days. At the same rate, how many can 6 analysts document in 2 days?",
+      o: ["40", "60", "80", "90"], a: 1,
+      why: "Unit rate = 60 ÷ (4 × 3) = 5 requirements per analyst-day. Then 6 analysts × 2 days × 5 = 60. Again: solve the per-unit rate first, then scale both dimensions."
+    },
+
+    {
+      s: 3, t: "mcq", p: 3, q: "Policy: a claim needs manager approval if it is over R100,000 OR flagged high-risk. A R80,000 claim flagged high-risk:",
+      o: ["does not need approval, as it is under R100,000", "needs approval, because it is flagged high-risk", "needs approval only if it is also over R100,000", "cannot be processed under the policy at all"], a: 1,
+      why: "The condition is an OR: either branch being true triggers approval. The high-risk flag alone satisfies it, regardless of the amount. Reading OR as though both conditions must hold is the logic trap."
+    },
+
+    {
+      s: 3, t: "mcq", p: 3, sc: `A branch reports these onboarding drop-off rates by step:
+
+  Step 1  Enter details ......... 5% drop
+  Step 2  Upload ID ............ 38% drop
+  Step 3  Confirm address ....... 6% drop
+  Step 4  Review & submit ....... 4% drop`,
+      q: "Which step should be investigated first, and why?",
+      o: ["Step 1, because it is the first thing every user sees", "Step 2, because its 38% drop dwarfs the other steps", "Step 4, because losing users at the end is most costly", "Every step equally, since all lose some users"], a: 1,
+      why: "Step 2 loses 38% — many times the other steps combined — so Pareto says start there (likely a hard upload or camera step). Fixing the biggest leak first yields the largest gain per unit of effort."
+    },
+
+    /* ---- Section 3 written ---- */
+    {
+      s: 3, t: "write", p: 10, sc: `PROBLEM STATEMENT
+
+Nexus Bank's call centre handles 50,000 calls a month. The Head of Service tells you: "Our customers are unhappy. Fix the call centre." That is the entire brief. You have two weeks before presenting back.`,
+      q: "How would you approach this? Set out your approach, the questions you would ask, the data you would seek, and what you would deliver in two weeks.",
+      hint: "~250–350 words. The classic vague-brief problem. Structure beats eloquence — show that you refuse to jump to a solution.",
+      model: `1. REFUSE TO SOLVE THE WRONG PROBLEM\n“Fix the call centre” is a solution; “customers are unhappy” is a symptom. First I need the problem in measurable terms: unhappy how, which customers, versus what, and what would ‘fixed’ look like?\n\n2. QUESTIONS FOR THE SPONSOR\n• What triggered this now — an NPS drop, a complaint, a board comment?\n• How is dissatisfaction measured today (NPS/CSAT, complaints, churn), what's the number, and the target?\n• Is the real driver cost, experience, or complaint/regulatory risk?\n• What's in and out of scope — can I touch upstream processes or only the call centre?\n\n3. DATA I'D SEEK\n• Call volumes by reason code, average handle time, wait time, abandonment, first-call resolution, repeat-call rate.\n• Complaint and CSAT/NPS data segmented by customer type and call driver.\n• Agent-side: attrition, training, number of screens per call.\n• Shadow agents and listen to calls — the tacit reality never shows in the reports.\n\n4. ANALYSIS\nPareto the call reasons; for the top few ask why the customer is calling at all. Most call-centre load is failure demand created upstream. Use 5 Whys / fishbone on the top drivers, and map the as-is journey.\n\n5. DELIVER IN TWO WEEKS\n• A problem statement restated in measurable terms, agreed with the sponsor.\n• A Pareto of drivers with root causes for the top few.\n• An as-is journey map showing where failure demand is created.\n• Prioritised options on a value/effort matrix — likely including fixes outside the call centre — each with impact, effort and assumptions.\n• A recommendation with trade-offs, and what I still don't know.\nI would NOT deliver a spec for a new call-centre system — that decision isn't ripe.`,
+      rubric: ["Separated the symptom (‘unhappy’) from the real, measurable problem", "Challenged ‘fix the call centre’ as a pre-supposed solution", "Asked how success/dissatisfaction is measured, and the target", "Asked what triggered the request / the real driver (cost vs experience vs risk)", "Named specific quantitative data (call drivers, AHT, first-call resolution, repeat calls, CSAT/NPS)", "Included a qualitative step — shadowing agents or listening to calls", "Named a technique used correctly (Pareto, 5 Whys/fishbone, as-is journey map)", "Recognised call volume as failure demand created upstream — fix may be outside the call centre", "Defined concrete two-week deliverables (restated problem, root-cause analysis, prioritised options, recommendation)", "Stated assumptions / what remains unknown rather than over-claiming"]
     },
 
     {
       s: 3, t: "write", p: 10, sc: `PROBLEM STATEMENT
 
-Nexus Bank's call centre handles 50,000 calls a month. The Head of Service tells you: "Our customers are unhappy. Fix the call centre."
-
-That is all the brief you are given. You have two weeks before you must present back.`,
-      q: "How would you approach this problem? Set out your approach, the questions you would ask, the data you would seek, and what you would deliver in two weeks.",
-      hint: "~250–350 words. This is the classic 'vague brief' problem-solving question. Structure beats eloquence — they want to see you refuse to jump to a solution.",
-      model: `1. REFUSE TO SOLVE THE WRONG PROBLEM
-"Fix the call centre" is a solution masquerading as a problem, and "customers are unhappy" is a symptom. Before anything else I need the problem defined in measurable terms: unhappy how, which customers, compared to what, and what would "fixed" look like?
-
-2. QUESTIONS FOR THE SPONSOR
-• What triggered this now — a specific complaint, an NPS drop, a board comment?
-• How is dissatisfaction currently measured (NPS/CSAT, complaints, social media, churn)? What is the number, and what is the target?
-• Is the real driver cost, customer experience, or regulatory/complaint risk? That changes the solution entirely.
-• What is in and out of scope — can I touch upstream processes, or only the call centre itself?
-• Who owns the decision, and what is the budget/timeline reality?
-
-3. DATA I WOULD SEEK
-• Call volumes by reason code, average handle time, wait time, abandonment rate, first-call resolution rate, repeat-call rate.
-• Complaint and CSAT/NPS data, segmented by customer type and by call driver.
-• Agent-side data: attrition, training, system switching (how many screens per call).
-• Listen to calls / shadow agents for a day — the tacit reality never appears in the reports.
-
-4. ANALYSIS
-Pareto the call reasons: typically a handful of drivers cause most of the volume. Then ask, for each top driver, *why is the customer calling at all?* — most call-centre problems are failures upstream (a confusing statement, a broken self-service journey, a process that silently fails). Use 5 Whys / fishbone on the top two or three drivers to reach actionable root causes, and map the as-is journey to locate the pain.
-
-5. WHAT I DELIVER IN TWO WEEKS
-• A problem statement restated in measurable terms, agreed with the sponsor.
-• A Pareto of call drivers with root causes for the top few, evidenced by data.
-• An as-is journey/process map showing where failure demand is created.
-• A prioritised set of options on a value/effort matrix — likely including fixes *outside* the call centre — each with expected impact, effort and assumptions.
-• A recommendation with the trade-offs, plus what I still don't know and how I'd find out.
-
-I would NOT deliver a specification for a new call-centre system. That decision isn't ripe yet, and committing to it now would be the expensive mistake.`,
-      rubric: ["Explicitly refused to accept the brief at face value — separated the symptom ('unhappy') from the real, measurable problem", "Challenged 'fix the call centre' as a pre-supposed solution rather than a problem statement", "Listed clarifying questions for the sponsor, including how success/dissatisfaction is MEASURED and what the target is", "Asked what triggered the request now / what the real driver is (cost vs experience vs risk)", "Named specific quantitative data to gather (call drivers, AHT, first-call resolution, repeat calls, CSAT/NPS, complaints)", "Included a qualitative/observational step (shadow agents, listen to calls, talk to customers) — not just reports", "Named a real analysis technique and used it correctly (Pareto on call drivers, 5 Whys / fishbone for root cause, as-is journey map)", "Recognised that call volume is often 'failure demand' caused UPSTREAM — the fix may lie outside the call centre", "Defined concrete two-week deliverables (restated problem statement, root-cause analysis, prioritised options with effort/impact, recommendation)", "Stated assumptions and what remains unknown, rather than over-claiming certainty"]
-    },
-
-    {
-      s: 3, t: "write", p: 10, sc: `PROBLEM STATEMENT
-
-You are two weeks from go-live on the Nexus Bank onboarding journey. During UAT, the Compliance Officer reviews the solution for the first time in months and states that the digital ID verification does not meet FICA requirements: a "liveness check" is legally required and was never built.
-
-The sponsor has already announced the launch date publicly. The dev team estimates the liveness check at 4 weeks of work. Compliance will not sign off without it.`,
+Two weeks from go-live on the Nexus Bank onboarding journey, the Compliance Officer reviews it for the first time and states that the digital ID verification does not meet FICA: a "liveness check" is legally required and was never built. The sponsor has publicly announced the launch date. Dev estimates the liveness check at 4 weeks. Compliance will not sign off without it.`,
       q: "What do you do? Set out your immediate actions, the options you would put to the sponsor, and your recommendation.",
-      hint: "~250–350 words. They want to see: no panic, no blame, options with trade-offs, and a spine when the pressure is on. There IS a right answer about what you cannot ship.",
-      model: `1. IMMEDIATE ACTIONS (within 24 hours)
-• Confirm the facts precisely with Compliance, in writing: which regulation, which clause, what exactly constitutes acceptable liveness, and is there any approved alternative control? I verify before I escalate — the requirement may be narrower (or broader) than the corridor conversation suggested.
-• Establish whether this is genuinely mandatory. A legal/regulatory constraint is not negotiable and is not a "nice to have" the sponsor can descope. If it is mandatory, launching without it is not an option that exists — shipping it would expose the bank to regulatory sanction and the board to personal liability.
-• Do a rapid impact analysis with the dev lead and architect: is the 4 weeks reducible? Is there a compliant third-party liveness SDK that could be integrated faster than building it?
-• Escalate immediately and factually to the sponsor. Bad news does not improve with age, and two weeks out he still has choices; two days out he has none.
+      hint: "~250–350 words. No panic, no blame, options with trade-offs, and a spine. There IS a right answer about what you cannot ship.",
+      model: `1. IMMEDIATE ACTIONS (24h)\n• Confirm the facts with Compliance in writing: which regulation, what exactly constitutes acceptable liveness, any approved alternative control? Verify before escalating.\n• Establish that it is genuinely mandatory. A legal requirement is not a ‘must have’ the sponsor can descope; launching without it exposes the bank to sanction. If mandatory, ‘launch anyway’ is not an option that exists.\n• Rapid impact analysis with the dev lead/architect: can the 4 weeks shrink? Is there a compliant third-party liveness SDK faster to integrate than to build?\n• Escalate to the sponsor immediately, with facts — bad news doesn't improve with age.\n\n2. OPTIONS FOR THE SPONSOR (with trade-offs)\nA. Delay ~4–6 weeks: costs public credibility; launches complete and compliant. Lowest risk.\nB. Soft/phased launch on the date to a limited group who verify ID via the existing compliant assisted/branch channel; switch on full digital self-service once liveness ships. Meets the date in substance, stays compliant.\nC. Buy rather than build the liveness component — may cut 4 weeks to 1–2 at licence cost, subject to Compliance approving the vendor.\nD. Launch without it — NOT viable; I'd say so plainly and on the record.\n\n3. RECOMMENDATION\nPursue C in parallel with B: soft-launch on the announced date through the compliant channel while procuring/building liveness, then enable full digital. Protects the sponsor's commitment without ever breaching.\n\n4. WITHOUT BLAME\nThis is a process failure — a legally accountable stakeholder engaged too late, no compliance sign-off gate on the baseline. I'd propose that gate for the future.`,
+      rubric: ["Verified the requirement precisely, in writing, with Compliance before acting", "Recognised a regulatory requirement is non-negotiable — it can't be descoped by the sponsor", "Escalated to the sponsor immediately with facts, not hidden or absorbed", "Did an impact analysis with the tech team, including whether 4 weeks can compress", "Considered buy-vs-build (a vendor liveness SDK) to shorten the timeline", "Presented multiple options with their trade-offs, not one take-it-or-leave-it", "Proposed a phased/soft-launch option preserving the date without breaching compliance", "Stated explicitly that launching non-compliant is not an option, and would record it", "Made a clear recommendation rather than only listing options", "Addressed root cause without blame and proposed a sign-off gate for the future"]
+    },
 
-2. OPTIONS FOR THE SPONSOR (with trade-offs)
-A. Delay the launch by ~4–6 weeks. Cost: public credibility, the board commitment. Benefit: launch compliant and complete. Lowest risk.
-B. Phased / soft launch: go live on the announced date to a limited pilot group who complete ID verification through the existing branch/assisted channel (a known-compliant path), and release the fully digital self-service journey once liveness is delivered. Meets the date in substance, keeps the promise visible, stays compliant.
-C. Buy rather than build the liveness component — may compress 4 weeks to 1–2, at licence cost, subject to Compliance approving the vendor.
-D. Launch without it — NOT a viable option. I would say so plainly and record it.
+    {
+      s: 3, t: "write", p: 10, sc: `PROBLEM STATEMENT
 
-3. RECOMMENDATION
-Pursue C in parallel with B: soft-launch on the announced date via the compliant assisted channel while procuring or building the liveness check, then switch on the full digital journey. This protects the sponsor's public commitment without ever putting the bank in breach.
-
-4. AND THEN, WITHOUT BLAME
-This is a process failure, not a person's failure: a legally accountable stakeholder was not engaged early and requirements were baselined without a compliance sign-off gate. In the retrospective I would propose that compliance sign-off becomes an explicit gate on the requirements baseline, and that regulatory stakeholders are mapped as must-consult from day one.`,
-      rubric: ["Verified the requirement precisely with Compliance IN WRITING before acting (which regulation, what constitutes acceptable liveness)", "Recognised a regulatory/legal requirement is non-negotiable — it cannot be descoped or traded away by the sponsor", "Escalated to the sponsor immediately with facts, rather than hiding it or hoping to absorb it quietly", "Did an impact analysis with the tech team — including whether the 4 weeks can be compressed", "Considered buy-vs-build for the liveness component (a vendor SDK) as a way to compress the timeline", "Presented the sponsor with multiple options AND their trade-offs, rather than a single take-it-or-leave-it answer", "Proposed a phased / soft-launch / limited-pilot option that preserves the announced date without breaching compliance", "Explicitly stated that launching non-compliant is not an option, and would put that on the record", "Made a clear recommendation instead of only listing options", "Addressed root cause without blame — compliance stakeholder engaged too late; proposed a sign-off gate for the future"]
+You inherit a 40-item product backlog for the Nexus onboarding journey and a hard 3-month window for a first release. The items range from "must exist to open an account at all" to "nice-to-have personalisation". Stakeholders each insist their item is critical.`,
+      q: "How would you decide what makes the first release? Describe your approach, the questions you'd ask, and what you would deliver.",
+      hint: "~200–300 words. They want a defensible prioritisation method and the discipline to say no — not a gut call.",
+      model: `1. ANCHOR ON THE OBJECTIVE\nEverything is prioritised against the release goal: enable a customer to open a compliant account digitally, same-day. If an item doesn't serve that, it isn't release-one.\n\n2. QUESTIONS\n• What is the minimum a customer must do to open a *compliant* account? (Compliance/FICA items are non-negotiable ‘Musts’ — they don't compete with features.)\n• For each item: what breaks if it's absent this release? Is there a manual or assisted workaround?\n• What's the real deadline driver, and is any scope legally or contractually fixed?\n\n3. METHOD\n• MoSCoW to separate genuine Musts (legal + core account opening) from Shoulds/Coulds.\n• Then a value/effort matrix across the non-Musts to sequence quick wins vs expensive extras.\n• Test ‘critical’ claims against the objective and the workaround question — most soften.\n• Confirm the Musts fit well inside the window; if not, the scope or date must give, and I surface that early.\n\n4. DELIVER\n• A prioritised backlog: Must/Should/Could, with personalisation and similar as explicit ‘Won't (this release)’ — a recorded decision, not a silent drop.\n• The value/effort matrix and the reasoning.\n• A first-release scope recommendation with the trade-offs, agreed with the sponsor as the single decision-maker.\nI make the cost of ‘yes’ visible; the sponsor owns the final call.`,
+      rubric: ["Anchored prioritisation on the release objective, not stakeholder volume", "Separated non-negotiable compliance/core items from optional features", "Asked what breaks / whether a workaround exists for each item", "Used a named method correctly (MoSCoW, and/or value-effort matrix)", "Pressure-tested ‘everything is critical’ claims against the objective", "Checked the Musts actually fit the window, and flagged early if not", "Recorded excluded items as an explicit ‘Won't this release’ decision, not a silent drop", "Left the final decision with the accountable sponsor while making trade-offs visible"]
     }
   ];
 
@@ -1364,6 +1526,33 @@ This is a process failure, not a person's failure: a legally accountable stakeho
   const S = { ans: {}, submitted: {}, cur: 0, started: 0, timed: true, remaining: 90 * 60, tabs: 0, tick: null, over: false };
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+  /* ============================ RANDOMISED ATTEMPT ============================ */
+  // How many of each type to draw from POOL per attempt:
+  const BLUEPRINT = { s1: 20, s2mcq: 5, s2write: 2, s3mcq: 4, s3write: 2 };
+  let Q = [];  // the active, per-attempt question list (built by buildActive)
+
+  function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function sample(arr, n) { return shuffle(arr.slice()).slice(0, n); }
+
+  function buildActive() {
+    const pick = (s, t) => POOL.filter(q => q.s === s && q.t === t);
+    const list = [
+      ...sample(pick(1, 'mcq'), BLUEPRINT.s1),
+      ...sample(pick(2, 'mcq'), BLUEPRINT.s2mcq),
+      ...sample(pick(2, 'write'), BLUEPRINT.s2write),
+      ...sample(pick(3, 'mcq'), BLUEPRINT.s3mcq),
+      ...sample(pick(3, 'write'), BLUEPRINT.s3write)
+    ];
+    // clone each question, and for MCQs shuffle the options while tracking the correct one
+    Q = list.map(q => {
+      if (q.t !== 'mcq') return { ...q };
+      const opts = q.o.map((text, idx) => ({ text, correct: idx === q.a }));
+      shuffle(opts);
+      return { ...q, o: opts.map(o => o.text), a: opts.findIndex(o => o.correct) };
+    });
+    S.ans = {}; S.submitted = {}; S.cur = 0;
+  }
 
   /* ============================ TIMER / TABS ============================ */
   function fmt(s) { const m = Math.floor(s / 60); return String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
@@ -1389,7 +1578,7 @@ This is a process failure, not a person's failure: a legally accountable stakeho
   function buildNav() {
     [1, 2, 3].forEach(sec => {
       const box = $('nav' + sec); box.innerHTML = '';
-      QUESTIONS.forEach((q, i) => {
+      Q.forEach((q, i) => {
         if (q.s !== sec) return;
         const b = document.createElement('button');
         b.className = 'qbtn'; b.textContent = i + 1; b.dataset.i = i;
@@ -1409,9 +1598,9 @@ This is a process failure, not a person's failure: a legally accountable stakeho
   const SECNAME = { 1: 'Section 1 — Multiple Choice', 2: 'Section 2 — Case Study', 3: 'Section 3 — Problem Solving' };
 
   function render() {
-    const i = S.cur, q = QUESTIONS[i];
+    const i = S.cur, q = Q[i];
     let h = `<div class="qhead"><div><div class="sect">${SECNAME[q.s]}</div>
-    <div style="font-weight:700;font-size:17px;margin-top:2px">Question ${i + 1} of ${QUESTIONS.length}</div></div>
+    <div style="font-weight:700;font-size:17px;margin-top:2px">Question ${i + 1} of ${Q.length}</div></div>
     <div class="pts">${q.p} point${q.p > 1 ? 's' : ''}</div></div>`;
     if (q.sc) h += `<div class="scenario"><b>Scenario</b>${esc(q.sc)}</div>`;
     h += `<p class="stem">${esc(q.q)}</p>`;
@@ -1431,7 +1620,7 @@ This is a process failure, not a person's failure: a legally accountable stakeho
     h += `<div class="foot">
     <button class="btn" onclick="submitQ(${i})">Submit answer</button>
     <button class="btn sec" onclick="go(-1)" ${i === 0 ? 'disabled' : ''}>Previous</button>
-    <button class="btn sec" onclick="go(1)" ${i === QUESTIONS.length - 1 ? 'disabled' : ''}>Next</button>
+    <button class="btn sec" onclick="go(1)" ${i === Q.length - 1 ? 'disabled' : ''}>Next</button>
     <span class="saved ${S.submitted[i] ? 'show' : ''}" id="sv">✓ Submitted</span></div>`;
 
     $('qpanel').innerHTML = h;
@@ -1449,44 +1638,47 @@ This is a process failure, not a person's failure: a legally accountable stakeho
     if (S.ans[i] === undefined || S.ans[i] === '') { alert('Nothing to submit yet.'); return; }
     S.submitted[i] = true;
     const sv = $('sv'); if (sv) sv.classList.add('show');
-    setTimeout(() => { if (i < QUESTIONS.length - 1) { S.cur = i + 1; render(); } }, 350);
+    setTimeout(() => { if (i < Q.length - 1) { S.cur = i + 1; render(); } }, 350);
   }
-  function go(d) { const n = S.cur + d; if (n >= 0 && n < QUESTIONS.length) { S.cur = n; render(); } }
+  function go(d) { const n = S.cur + d; if (n >= 0 && n < Q.length) { S.cur = n; render(); } }
 
   /* ============================ RESULTS ============================ */
-  const selfMarks = {}; // qIndex -> Set of ticked rubric idx
-
   function finish(auto) {
     S.over = true; clearInterval(S.tick);
     $('test').classList.add('hide'); $('confirm').classList.add('hide');
     $('endBtn').classList.add('hide');
     const used = S.timed ? (90 * 60 - S.remaining) : 0;
 
-    let autoGot = 0, autoMax = 0, wrongList = [];
-    QUESTIONS.forEach((q, i) => {
+    let autoGot = 0, autoMax = 0;
+    Q.forEach((q, i) => {
       if (q.t !== 'mcq') return;
       autoMax += q.p;
-      if (S.ans[i] === q.a) autoGot += q.p; else wrongList.push(i);
+      if (S.ans[i] === q.a) autoGot += q.p;
     });
-    const writeMax = QUESTIONS.filter(q => q.t === 'write').reduce((a, q) => a + q.p, 0);
+    const writeQs = Q.filter(q => q.t === 'write');
+    const writeMax = writeQs.reduce((a, q) => a + q.p, 0);
+    const pct = autoMax ? Math.round((autoGot / autoMax) * 100) : 0;
 
-    let h = `<h1>Review & self-grade</h1>`;
+    let h = `<h1>Review</h1>`;
     if (auto) h += `<p style="color:var(--brand);font-weight:600">⏰ Time expired — the test auto-submitted, exactly as it will on the day.</p>`;
     h += `<div class="scorebar">
-    <div class="stat"><div class="n">${autoGot}/${autoMax}</div><div class="l">Auto-scored</div></div>
-    <div class="stat"><div class="n" id="wscore">0/${writeMax}</div><div class="l">Written (self-graded)</div></div>
-    <div class="stat"><div class="n" id="tscore">${autoGot}/${autoMax + writeMax}</div><div class="l">Total</div></div>
+    <div class="stat"><div class="n">${autoGot}/${autoMax}</div><div class="l">MCQ auto-scored</div></div>
+    <div class="stat"><div class="n">${pct}%</div><div class="l">MCQ correct</div></div>
+    <div class="stat"><div class="n">${writeQs.length}·${writeMax}pt</div><div class="l">Written — mark with AI</div></div>
     ${S.timed ? `<div class="stat"><div class="n">${fmt(used)}</div><div class="l">Time used</div></div>` : ''}
     <div class="stat"><div class="n">${S.tabs}</div><div class="l">Tab switches</div></div>
-  </div>
-  <p style="font-size:14px;color:var(--muted)">Tick every rubric point your written answer <i>actually</i> made — not the ones you meant to make. The gap between those two is the whole point of doing this.</p>`;
+  </div>`;
 
-    QUESTIONS.forEach((q, i) => {
+    if (writeQs.length) h += `<div style="background:#e8f2ff;border:1px solid #b9d4f0;border-radius:8px;padding:14px 18px;font-size:14px;margin-bottom:8px">
+      <b>Grading the written answers:</b> each one below has a <b>📋 Copy for AI marking</b> button. It copies the question, the marking rubric and your answer, pre-wrapped in a prompt — paste it straight into Claude for a strict, specific mark out of the points available. Or open the model answer and self-check against it.</div>`;
+
+    Q.forEach((q, i) => {
       if (q.t === 'mcq') {
         const ok = S.ans[i] === q.a;
         const given = S.ans[i] === undefined ? '<i>No answer</i>' : esc(q.o[S.ans[i]]);
         h += `<div class="rev ${ok ? 'correct' : 'wrong'}">
         <h3>Q${i + 1} <span class="tag ${ok ? 'ok' : 'no'}">${ok ? 'Correct' : 'Incorrect'}</span> <span style="color:var(--muted);font-weight:400">· ${SECNAME[q.s]}</span></h3>
+        ${q.sc ? `<div class="scenario" style="margin-bottom:8px"><b>Scenario</b>${esc(q.sc)}</div>` : ''}
         <div style="font-size:14.5px;margin-bottom:8px">${esc(q.q)}</div>
         ${!ok ? `<div style="font-size:14px"><b>Your answer:</b> ${given}</div>` : ''}
         <div style="font-size:14px"><b>Correct:</b> ${esc(q.o[q.a])}</div>
@@ -1495,38 +1687,52 @@ This is a process failure, not a person's failure: a legally accountable stakeho
         const yours = (S.ans[i] || '').trim();
         h += `<div class="rev written">
         <h3>Q${i + 1} · Written · ${q.p} points <span style="color:var(--muted);font-weight:400">· ${SECNAME[q.s]}</span></h3>
+        ${q.sc ? `<div class="scenario" style="margin-bottom:8px"><b>Scenario</b>${esc(q.sc)}</div>` : ''}
         <div style="font-size:14.5px;margin-bottom:10px">${esc(q.q)}</div>
-        <details open><summary>Your answer</summary>
-          <div class="yourans" style="margin-top:8px">${yours ? esc(yours) : '<i>Not attempted — this is worth going back and writing out. The written sections carry the most marks.</i>'}</div>
+        <details open><summary>Your answer (${(yours ? yours.split(/\s+/).filter(Boolean).length : 0)} words)</summary>
+          <div class="yourans" style="margin-top:8px">${yours ? esc(yours) : '<i>Not attempted — worth going back and writing out. The written sections carry the most marks.</i>'}</div>
         </details>
-        <div class="rubric"><b style="font-size:14px">Rubric — tick what you actually covered:</b>
-          ${q.rubric.map((r, k) => `<label><input type="checkbox" onchange="mark(${i},${k},this.checked,${q.rubric.length},${q.p})"><span>${esc(r)}</span></label>`).join('')}
+        <div style="margin-top:12px">
+          <button class="btn" onclick="copyMark(${i},this)" ${yours ? '' : 'disabled'}>📋 Copy for AI marking</button>
         </div>
-        <details style="margin-top:12px"><summary>Show model answer</summary>
+        <details style="margin-top:12px"><summary>Show marking rubric</summary>
+          <ul style="margin-top:8px;font-size:14px">${q.rubric.map(r => `<li>${esc(r)}</li>`).join('')}</ul></details>
+        <details style="margin-top:8px"><summary>Show model answer</summary>
           <div class="model">${esc(q.model)}</div></details>
       </div>`;
       }
     });
 
-    h += `<p style="margin-top:26px"><button class="btn" onclick="location.reload()">Retake</button></p>`;
+    h += `<p style="margin-top:26px"><button class="btn" onclick="retake()">↻ New randomised attempt</button></p>`;
     const r = $('results'); r.innerHTML = h; r.classList.remove('hide');
-    window.__auto = { autoGot, autoMax, writeMax };
     window.scrollTo(0, 0);
   }
 
-  function mark(i, k, on, total, pts) {
-    selfMarks[i] = selfMarks[i] || new Set();
-    on ? selfMarks[i].add(k) : selfMarks[i].delete(k);
-    let got = 0;
-    QUESTIONS.forEach((q, qi) => {
-      if (q.t !== 'write') return;
-      const set = selfMarks[qi];
-      if (set && set.size) got += (set.size / q.rubric.length) * q.p;
-    });
-    got = Math.round(got * 10) / 10;
-    const { autoGot, autoMax, writeMax } = window.__auto;
-    $('wscore').textContent = `${got}/${writeMax}`;
-    $('tscore').textContent = `${Math.round((autoGot + got) * 10) / 10}/${autoMax + writeMax}`;
+  function copyMark(i, btn) {
+    const q = Q[i];
+    const txt =
+      `You are a senior business analyst interviewer marking a candidate's answer to a BA technical assessment. Mark it strictly out of ${q.p} points.
+
+For EACH rubric point below, say HIT or MISS with a one-line reason. Then give: a total out of ${q.p}, the two strongest things about the answer, and the two most valuable improvements. Be specific and honest — do not be generous.
+
+${q.sc ? 'SCENARIO:\n' + q.sc + '\n\n' : ''}QUESTION:
+${q.q}
+
+MARKING RUBRIC (each point roughly equal weight):
+${q.rubric.map((r, k) => `${k + 1}. ${r}`).join('\n')}
+
+CANDIDATE'S ANSWER:
+${S.ans[i] || '(blank)'}`;
+    navigator.clipboard.writeText(txt).then(() => {
+      const o = btn.textContent; btn.textContent = '✓ Copied — paste into Claude'; btn.disabled = true;
+      setTimeout(() => { btn.textContent = o; btn.disabled = false; }, 2200);
+    }, () => { alert('Copy failed — select the model answer manually.'); });
+  }
+
+  function retake() {
+    $('results').classList.add('hide');
+    S.remaining = 90 * 60; S.tabs = 0; S.over = false;
+    begin(S.timed);
   }
 
   /* ============================ STUDY GUIDE ============================ */
@@ -2285,10 +2491,16 @@ This is a process failure, not a person's failure: a legally accountable stakeho
 
   /* ============================ BOOT ============================ */
   function begin(timed) {
-    S.timed = timed; S.started = Date.now();
+    S.timed = timed; S.started = Date.now(); S.over = false;
+    S.remaining = 90 * 60; S.tabs = 0;
+    $('timer').classList.remove('hide'); $('timer').classList.remove('low');
+    $('endBtn').classList.remove('hide');
+    buildActive();                 // fresh randomised draw + shuffled options each attempt
     $('start').classList.add('hide');
+    $('study').classList.add('hide'); $('homeBtn').classList.add('hide');
+    $('results').classList.add('hide');
     $('test').classList.remove('hide');
-    $('tabct').textContent = 'Tab switches: 0 / 30';
+    $('tabct').textContent = 'Tab switches: 0 / 30'; $('tabct').style.color = '';
     buildNav(); render(); startTimer();
   }
   $('startBtn').onclick = () => begin(true);
